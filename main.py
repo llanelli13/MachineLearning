@@ -5,6 +5,7 @@ def prepartation_donnee():
     #ouvrir fichier csv
     data = pd.read_csv('Data/Data_X.csv')
     print(data)
+
     # Supprime ligne entièrement vide
     data_notnull=data.dropna(how='all')
     print(data)
