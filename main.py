@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 
 
 def prepartation_donnee():
-
-    #ouvrir fichier csv
+    # ouvrir fichier csv
     data_x = pd.read_csv('Data/Data_X.csv')
     data_y = pd.read_csv("Data/Data_Y.csv")
 
@@ -14,42 +13,62 @@ def prepartation_donnee():
     merged_data = pd.merge(data_x, data_y, on='ID')
 
     # Supprime ligne entièrement vide
-    data_notnull=merged_data.dropna(how='all')
+    data_notnull = merged_data.dropna(how='all')
     # met O sur case null
     data_dim_fill = data_notnull.fillna(0)
 
     # Normalisation des données à partir de la 4ème colonne
     cols_to_normalize = data_dim_fill.columns[3:]
-    merged_data[cols_to_normalize] = (data_dim_fill[cols_to_normalize] - data_dim_fill[cols_to_normalize].mean()) /data_dim_fill[cols_to_normalize].std()
+    data_dim_fill[cols_to_normalize] = (data_dim_fill[cols_to_normalize] - data_dim_fill[cols_to_normalize].mean()) / \
+                                       data_dim_fill[cols_to_normalize].std()
 
     # remplace FR et DE par des float
-    merged_data['COUNTRY'] = merged_data['COUNTRY'].map({'FR': 1, 'DE': 2})
+    data_dim_fill['COUNTRY'] = data_dim_fill['COUNTRY'].map({'FR': 1, 'DE': 2})
 
     # Calculer la matrice de corrélation
-    corr_matrix = merged_data.corr()
+    corr_matrix = data_dim_fill.corr()
     # Afficher la matrice de corrélation sous forme de heatmap
-    sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
-    plt.show()
+    # sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
+    # plt.show()
     # Enlever la partie inferieur de la matrice
     mask = np.tril(np.ones_like(corr_matrix, dtype=bool))
     corr_matrix = corr_matrix.mask(mask)
     # Afficher la matrice de corrélation sans diagonale
-    sns.heatmap(corr_matrix, cmap="coolwarm", annot=False, fmt=".2f")
-    plt.show()
+    # sns.heatmap(corr_matrix, cmap="coolwarm", annot=False, fmt=".2f")
+    # plt.show()
 
-    #Corrélation positive
+    # Corrélation positive
+    tab_f = []
     indices = np.where(corr_matrix > 0.75)
     print("\nForte corrélation positive entre : ")
     colonne = indices[0]
     ligne = indices[1]
-    column_names = merged_data.columns
-    for k in range (len(colonne)):
+    column_names = data_dim_fill.columns
+    for k in range(len(colonne)):
         column_names_c = column_names[colonne[k]]
-        column_names_l= column_names[ligne[k]]
+        column_names_l = column_names[ligne[k]]
+        tab_f.append([column_names_c,column_names_l])
         print(column_names_c, column_names_l)
 
-    print("forte coorélation entre : ", indices)
-    """
+    # corrélation négative
+    tab_n=[]
+    indices = np.where(corr_matrix < -0.75)
+    print("\nForte corrélation négative entre : ")
+    colonne = indices[0]
+    ligne = indices[1]
+    column_names = data_dim_fill.columns
+    for k in range(len(colonne)):
+        column_names_c = column_names[colonne[k]]
+        column_names_l = column_names[ligne[k]]
+        tab_n.append([column_names_c, column_names_l])
+        print(column_names_c, column_names_l)
+
+    # Sous-ensemble
+    #print('\n',tab_f)
+    #print(tab_n)
+    return data_dim_fill,tab_n, tab_f
+
+"""
     # Avoir le maximum d'une colonne
     max = 0
     for i in range(len(data_dim_fill)):
@@ -72,8 +91,40 @@ def prepartation_donnee():
         data_sum += value
     data_mean = data_sum / len(data_dim_fill)
     print("moyenne = ", round(data_mean,2))
-    """
+"""
 
+def analyse_exploratoire(df):
+    #df.info()
+    #print(df.describe())
+    print(df)
+
+    # Histogramme
+    """
+    for col in df.columns:
+        plt.hist(df[col])
+        plt.title(col)
+        plt.show()
+    """
+    # Diagramme en boite
+    """
+    for col in df.columns:
+        plt.boxplot(df[col])
+        plt.title(col)
+        plt.show()
+    """
+    #Graphique de dispersion
+
+    #Matrice corrélation
+    corr_matrix = df.corr()
+    #Afficher la matrice de corrélation sous forme de heatmap
+    sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
+    plt.show()
+    # Enlever la partie inferieur de la matrice
+    mask = np.tril(np.ones_like(corr_matrix, dtype=bool))
+    corr_matrix = corr_matrix.mask(mask)
+    # Afficher la matrice de corrélation sans diagonale
+    sns.heatmap(corr_matrix, cmap="coolwarm", annot=False, fmt=".2f")
+    plt.show()
 
 """
 def jspcestquoilafonctionmaistqt():
@@ -97,4 +148,5 @@ def jspcestquoilafonctionmaistqt():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    prepartation_donnee()
+    sousensemble=prepartation_donnee()
+    analyse_exploratoire(sousensemble[0])
