@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-#import seaborn as sns
+import seaborn as sns
 
 
 def prepartation_donnee():
@@ -12,15 +12,21 @@ def prepartation_donnee():
     # Fusionner les données d'entrée et de sortie en fonction de l'ID
     merged_data = pd.merge(data_x, data_y, on='ID')
 
-    print(merged_data)
-
     # Supprime ligne entièrement vide
     data_notnull=merged_data.dropna(how='all')
-    print(data_notnull)
 
     # met O sur case null
     data_dim_fill = data_notnull.fillna(0)
+
+    data_dim_fill['COUNTRY'] = data_dim_fill['COUNTRY'].map({'FR': 1, 'DE': 2})
+
     print(data_dim_fill)
+
+    # Calculer la matrice de corrélation
+    corr_matrix = data_dim_fill.corr()
+
+    # Afficher la matrice de corrélation sous forme de heatmap
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
 
 
 """
