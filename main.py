@@ -15,32 +15,49 @@ def prepartation_donnee():
 
     # Supprime ligne entièrement vide
     data_notnull=merged_data.dropna(how='all')
-
     # met O sur case null
     data_dim_fill = data_notnull.fillna(0)
 
+    # Normalisation des données à partir de la 4ème colonne
+    cols_to_normalize = data_dim_fill.columns[3:]
+    merged_data[cols_to_normalize] = (data_dim_fill[cols_to_normalize] - data_dim_fill[cols_to_normalize].mean()) /data_dim_fill[cols_to_normalize].std()
+
     # remplace FR et DE par des float
-    data_dim_fill['COUNTRY'] = data_dim_fill['COUNTRY'].map({'FR': 1, 'DE': 2})
+    merged_data['COUNTRY'] = merged_data['COUNTRY'].map({'FR': 1, 'DE': 2})
 
     # Calculer la matrice de corrélation
-    corr_matrix = data_dim_fill.corr()
-
+    corr_matrix = merged_data.corr()
     # Afficher la matrice de corrélation sous forme de heatmap
-    #sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
-    #plt.show()
-
+    sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
+    plt.show()
     # Enlever la partie inferieur de la matrice
     mask = np.tril(np.ones_like(corr_matrix, dtype=bool))
     corr_matrix = corr_matrix.mask(mask)
-
     # Afficher la matrice de corrélation sans diagonale
-    #sns.heatmap(corr_matrix, cmap="coolwarm", annot=False, fmt=".2f")
-    #plt.show()
+    sns.heatmap(corr_matrix, cmap="coolwarm", annot=False, fmt=".2f")
+    plt.show()
 
+    #Corrélation positive
     indices = np.where(corr_matrix > 0.75)
+    print("\nForte corrélation positive entre : ")
+    colonne = indices[0]
+    ligne = indices[1]
+    column_names = merged_data.columns
+    for k in range (len(colonne)):
+        column_names_c = column_names[colonne[k]]
+        column_names_l= column_names[ligne[k]]
+        print(column_names_c, column_names_l)
 
-    print("forte coorélation entre : ")
-
+    #corrélation négative
+    indices = np.where(corr_matrix < -0.75)
+    print("\nForte corrélation négative entre : ")
+    colonne = indices[0]
+    ligne = indices[1]
+    column_names = merged_data.columns
+    for k in range(len(colonne)):
+        column_names_c = column_names[colonne[k]]
+        column_names_l = column_names[ligne[k]]
+        print(column_names_c, column_names_l)
 
 """
 def jspcestquoilafonctionmaistqt():
