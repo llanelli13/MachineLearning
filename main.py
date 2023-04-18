@@ -19,24 +19,29 @@ def prepartation_donnee():
     # met O sur case null
     data_dim_fill = data_notnull.fillna(0)
 
+    # remplace FR et DE par des float
     data_dim_fill['COUNTRY'] = data_dim_fill['COUNTRY'].map({'FR': 1, 'DE': 2})
-
-    print(data_dim_fill)
 
     # Calculer la matrice de corrélation
     corr_matrix = data_dim_fill.corr()
 
     # Afficher la matrice de corrélation sous forme de heatmap
-    sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
-    plt.show()
+    #sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
+    #plt.show()
 
-
+    # Enlever la partie inferieur de la matrice
     mask = np.tril(np.ones_like(corr_matrix, dtype=bool))
     corr_matrix = corr_matrix.mask(mask)
 
     # Afficher la matrice de corrélation sans diagonale
-    sns.heatmap(corr_matrix, cmap="coolwarm", annot=False, fmt=".2f")
-    plt.show()
+    #sns.heatmap(corr_matrix, cmap="coolwarm", annot=False, fmt=".2f")
+    #plt.show()
+
+    indices = np.where(corr_matrix > 0.75)
+
+    print("forte coorélation entre : ")
+
+
 """
 def jspcestquoilafonctionmaistqt():
     # Charger les données d'entrée Data X et de sortie Data Y
