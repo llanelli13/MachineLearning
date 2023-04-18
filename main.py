@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 def prepartation_donnee():
@@ -26,9 +27,16 @@ def prepartation_donnee():
     corr_matrix = data_dim_fill.corr()
 
     # Afficher la matrice de corrélation sous forme de heatmap
-    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
+    sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
+    plt.show()
 
 
+    mask = np.tril(np.ones_like(corr_matrix, dtype=bool))
+    corr_matrix = corr_matrix.mask(mask)
+
+    # Afficher la matrice de corrélation sans diagonale
+    sns.heatmap(corr_matrix, cmap="coolwarm", annot=False, fmt=".2f")
+    plt.show()
 """
 def jspcestquoilafonctionmaistqt():
     # Charger les données d'entrée Data X et de sortie Data Y
