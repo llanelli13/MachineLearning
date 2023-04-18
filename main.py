@@ -33,13 +33,36 @@ def prepartation_donnee():
     mask = np.tril(np.ones_like(corr_matrix, dtype=bool))
     corr_matrix = corr_matrix.mask(mask)
 
-    # Afficher la matrice de corrélation sans diagonale
-    #sns.heatmap(corr_matrix, cmap="coolwarm", annot=False, fmt=".2f")
-    #plt.show()
-
+    #Afficher la matrice de corrélation sans diagonale
+    sns.heatmap(corr_matrix, cmap="coolwarm", annot=False, fmt=".2f")
+    plt.show()
+    print(data_dim_fill)
     indices = np.where(corr_matrix > 0.75)
 
-    print("forte coorélation entre : ")
+    print("forte coorélation entre : ", indices)
+    
+    # Avoir le maximum d'une colonne
+    max = 0
+    for i in range(len(data_dim_fill)):
+        data = data_dim_fill['FR_NET_IMPORT'][i]
+        if data > max:
+            max = data
+    print("max = ", round(max,2))
+
+    # Avoir le minimum d'une colonne
+    min = 0
+    for i in range(len(data_dim_fill)):
+        data = data_dim_fill['FR_NET_IMPORT'][i]
+        if data < min:
+            min = data
+    print("min = ", round(min, 2))    
+    
+    # Avoir la moyenne d'une colonne
+    data_sum = 0
+    for value in data_dim_fill['FR_NET_IMPORT']:
+        data_sum += value
+    data_mean = data_sum / len(data_dim_fill)
+    print("moyenne = ", round(data_mean,2))
 
 
 """
