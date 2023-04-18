@@ -49,7 +49,7 @@ def prepartation_donnee():
         print(column_names_c, column_names_l)
 
     print("forte coorélation entre : ", indices)
-    
+    """
     # Avoir le maximum d'une colonne
     max = 0
     for i in range(len(data_dim_fill)):
@@ -72,6 +72,7 @@ def prepartation_donnee():
         data_sum += value
     data_mean = data_sum / len(data_dim_fill)
     print("moyenne = ", round(data_mean,2))
+    """
 
 
 """
