@@ -19,8 +19,7 @@ def prepartation_donnee():
 
     # Normalisation des données à partir de la 4ème colonne
     cols_to_normalize = data_dim_fill.columns[3:]
-    data_dim_fill[cols_to_normalize] = (data_dim_fill[cols_to_normalize] - data_dim_fill[cols_to_normalize].mean()) / \
-                                       data_dim_fill[cols_to_normalize].std()
+    data_dim_fill[cols_to_normalize] = (data_dim_fill[cols_to_normalize] - data_dim_fill[cols_to_normalize].mean()) / data_dim_fill[cols_to_normalize].std()
 
     # remplace FR et DE par des float
     data_dim_fill['COUNTRY'] = data_dim_fill['COUNTRY'].map({'FR': 1, 'DE': 2})
@@ -119,14 +118,14 @@ def analyse_exploratoire(df,tab_f,tab_n):
         plt.scatter(df[tab_f[k][0]],df[tab_f[k][1]],marker='+')
         plt.xlabel(tab_f[k][0])
         plt.ylabel(tab_f[k][1])
-        plt.title('Graphique de dispersion entre valeur corréler positivement')
+        plt.title('Graphique de dispersion entre valeurs corrélées positivement')
         plt.show()
 
     for k in range (len(tab_n)):
         plt.scatter(df[tab_n[k][0]],df[tab_n[k][1]],marker='+')
         plt.xlabel(tab_n[k][0])
         plt.ylabel(tab_n[k][1])
-        plt.title('Graphique de dispersion entre valeur corréler négativement')
+        plt.title('Graphique de dispersion entre valeurs corrélées négativement')
         plt.show()
     
     for col in df.columns:
