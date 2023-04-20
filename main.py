@@ -66,7 +66,7 @@ def prepartation_donnee():
     # Sous-ensemble
     #print('\n',tab_f)
     #print(tab_n)
-    return data_dim_fill,tab_n, tab_f
+    return data_dim_fill,tab_f, tab_n
 
 """
     # Avoir le maximum d'une colonne
@@ -93,7 +93,7 @@ def prepartation_donnee():
     print("moyenne = ", round(data_mean,2))
 """
 
-def analyse_exploratoire(df):
+def analyse_exploratoire(df,tab_f,tab_n):
     #df.info()
     #print(df.describe())
     print(df)
@@ -113,6 +113,29 @@ def analyse_exploratoire(df):
         plt.show()
     """
     #Graphique de dispersion
+    print(tab_f)
+    """
+    for k in range (len(tab_f)):
+        plt.scatter(df[tab_f[k][0]],df[tab_f[k][1]],marker='+')
+        plt.xlabel(tab_f[k][0])
+        plt.ylabel(tab_f[k][1])
+        plt.title('Graphique de dispersion entre valeur corréler positivement')
+        plt.show()
+
+    for k in range (len(tab_n)):
+        plt.scatter(df[tab_n[k][0]],df[tab_n[k][1]],marker='+')
+        plt.xlabel(tab_n[k][0])
+        plt.ylabel(tab_n[k][1])
+        plt.title('Graphique de dispersion entre valeur corréler négativement')
+        plt.show()
+    
+    for col in df.columns:
+        plt.scatter(df[col], df['TARGET'], marker='+')
+        plt.xlabel(col)
+        plt.ylabel('PRIX')
+        plt.title('Graphique de dispersion entre ' + str(col) + ' et le Prix')
+        plt.show()
+    """
 
     #Matrice corrélation
     corr_matrix = df.corr()
@@ -149,4 +172,4 @@ def jspcestquoilafonctionmaistqt():
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     sousensemble=prepartation_donnee()
-    analyse_exploratoire(sousensemble[0])
+    analyse_exploratoire(sousensemble[0],sousensemble[1],sousensemble[2])
