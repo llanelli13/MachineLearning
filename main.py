@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from scipy import stats
 
 
 def prepartation_donnee():
@@ -169,7 +170,44 @@ def jspcestquoilafonctionmaistqt():
     print(normalized_data.head())
 """
 
+def regression_linéaire(df) :
+    for col in df.columns:
+        X = df[col]
+        Y = df["TARGET"]
+
+        axes = plt.axes()
+        plt.xlabel(col)
+        plt.ylabel('PRIX')
+        axes.grid()
+        plt.scatter(X,Y)
+        # plt.show()
+        
+        # res = stats.linregress(X, Y)
+        # Coefficient de determination
+        # print(f"R-squared: {res.rvalue**2:.6f}")
+        
+        slope, intercept, r_value, p_value, std_err = stats.linregress(X, Y)
+        
+        # Plot the data along with the fitted line:
+        a = df[col][2]
+        
+        plt.plot(X, Y, 'o', label='original data')
+        plt.plot(X, intercept + slope*X, 'r', label='fitted line')
+        plt.legend()
+        plt.show()
+        
+        
+
+        print( slope * a + intercept) #check si cest proche de la vraie valeur 
+
+        # Parcourir les colonnes 
+        # Prendre une ligne temoin et 
+        # 
+        # #
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     sousensemble=prepartation_donnee()
     analyse_exploratoire(sousensemble[0],sousensemble[1],sousensemble[2])
+    regression_linéaire(sousensemble[0])
