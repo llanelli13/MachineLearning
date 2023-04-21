@@ -147,6 +147,8 @@ def regression_lineaire(df):
     #print("Corrélation de Spearman: ", res)
     #print("P-valeur: ", pvalue)
 
+    return score_lr
+
 def regression_lineaire_regularise(df):
     x_test = df.iloc[:, 3:35]
     y_test = df["TARGET"]
@@ -163,8 +165,8 @@ def regression_lineaire_regularise(df):
     print(performance)
     mse = np.mean((y_test - y_pred) ** 2)
     rmse = np.sqrt(mse)
-
-    print("Score :", r2_score(y_test, rid.predict(x_test)))
+    score_RD=r2_score(y_test, rid.predict(x_test))
+    print("Score :", score_RD)
     print('Erreur quadratique :', rmse)
     #res, pvalue = scipy.stats.spearmanr(x_test, y_test)
     #print("Corrélation de Spearman: ", res)
@@ -187,12 +189,14 @@ def regression_lineaire_regularise(df):
     print(performance)
     mse = np.mean((y_test - y_pred) ** 2)
     rmse = np.sqrt(mse)
-
-    print("Score :", r2_score(y_test, reg.predict(x_test)))
+    score_LA=r2_score(y_test, reg.predict(x_test))
+    print("Score :", score_LA)
     print('Erreur quadratique :', rmse)
     #res, pvalue = scipy.stats.spearmanr(x_test, y_test)
     #print("Corrélation de Spearman: ", res)
     #print("P-valeur: ", pvalue)
+
+    return score_RD, score_LA
 
 def knn (df):
 
@@ -224,6 +228,7 @@ def knn (df):
     #res, pvalue = scipy.stats.spearmanr(x, y)
     #print("Corrélation de Spearman: ", res)
     #print("P-valeur: ", pvalue)
+    return score_knn
 
 def arbre_decision(df):
     x = df.iloc[:, 3:35]
@@ -248,12 +253,14 @@ def arbre_decision(df):
     #print("Corrélation de Spearman: ", res)
     #print("P-valeur: ", pvalue)
 
+    return score_ab
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     df=prepartation_donnee()
     analyse_exploratoire(df)
-    regression_lineaire(df)
-    regression_lineaire_regularise(df)
-    knn(df)
-    arbre_decision(df)
+    score_lr=regression_lineaire(df)
+    score_RE, score_LA=regression_lineaire_regularise(df)
+    score_knn=knn(df)
+    score_ab=arbre_decision(df)
