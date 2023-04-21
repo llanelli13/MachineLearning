@@ -3,6 +3,11 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy import stats
+from sklearn.ensemble import HistGradientBoostingRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Ridge
+from sklearn.metrics import r2_score
 
 
 def prepartation_donnee():
@@ -141,13 +146,13 @@ def analyse_exploratoire(df,tab_f,tab_n):
     corr_matrix = df.corr()
     #Afficher la matrice de corrélation sous forme de heatmap
     sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
-    plt.show()
+    #plt.show()
     # Enlever la partie inferieur de la matrice
     mask = np.tril(np.ones_like(corr_matrix, dtype=bool))
     corr_matrix = corr_matrix.mask(mask)
     # Afficher la matrice de corrélation sans diagonale
     sns.heatmap(corr_matrix, cmap="coolwarm", annot=False, fmt=".2f")
-    plt.show()
+    #plt.show()
 
 """
 def jspcestquoilafonctionmaistqt():
@@ -168,8 +173,7 @@ def jspcestquoilafonctionmaistqt():
     normalized_data = (merged_data - merged_data.mean()) / merged_data.std()
     print(normalized_data.head())
 """
-
-def regression_linéaire(df) :
+def regression_lineaire(df):
     for col in df.columns:
         X = df[col]
         Y = df["TARGET"]
@@ -178,38 +182,98 @@ def regression_linéaire(df) :
         plt.xlabel(col)
         plt.ylabel('PRIX')
         axes.grid()
-        plt.scatter(X,Y)
+        plt.scatter(X, Y)
         # plt.show()
-        
+
         # res = stats.linregress(X, Y)
         # Coefficient de determination
         # print(f"R-squared: {res.rvalue**2:.6f}")
-        
+
         slope, intercept, r_value, p_value, std_err = stats.linregress(X, Y)
-        
+
         # Plot the data along with the fitted line:
         a = df[col][2]
-        
+
         plt.plot(X, Y, 'o', label='original data')
-        plt.plot(X, intercept + slope*X, 'r', label='fitted line')
+        plt.plot(X, intercept + slope * X, 'r', label='fitted line')
         plt.legend()
         plt.show()
-        
-        
 
-        print( slope * a + intercept) #check si cest proche de la vraie valeur 
+        print(slope * a + intercept)  # check si cest proche de la vraie valeur
 
-        # Parcourir les colonnes 
-        # Prendre une ligne temoin et 
-        # 
+        # Parcourir les colonnes
+        # Prendre une ligne temoin et
+        #
         # #
+def regression_lineaire_regularise(df):
+    x_test = df.iloc[:, 3:35]
+    y_test = df["TARGET"]
+    print(x_test)
+    print(y_test)
+
+    rid = Ridge(10).fit(x_test, y_test)
+    print(r2_score(y_test, rid.predict(x_test)))
+    """
+    
+
+    #x_log = np.log(x_test)
+    #y_log = np.log(y_test)
+
+    x_test = x_test.replace([np.inf, -np.inf], np.nan)
+    y_test = y_test.replace([np.inf, -np.inf], np.nan)
+
+    x_test = x_test.dropna()
+    y_test = y_test.dropna()
+
+    model = HistGradientBoostingRegressor().fit(x_test, y_test)
+    # Instance and fit
+    #lrLog_model = LinearRegression().fit(x_log, y_log)
+    # Remove zeroes
+    X_test_log = x_test[(x_test.x > 0) & (x_test.y > 0) & (x_test.z > 0) ]
+    y_test_log = y_test[X_test_log.index]
+    # Log Transform X_test and y test
+    X_test_log = np.log(X_test_log)
+    y_test_log = np.log(y_test_log)
+    # Score
+    score_log = model.score(X_test_log, y_test_log)
+    print(score_log)
+    # Predictions
+    preds = model.predict(X_test_log)
+    # Performance
+    performance=pd.DataFrame({ 'True Value': np.exp(y_test_log), 'Prediction': np.exp(preds)}).head(5)
+    print(performance)
+    """
+def knn (df):
+
+        x = df.iloc[:, 3:35]
+        print(x)
+        y = df["TARGET"]
+        print(y)
+
+        # Création d'un classificateur k-NN avec k=3
+        knn = KNeighborsRegressor(n_neighbors=5).fit(x,y)
+
+        #score
+        score_knn=knn.score(x,y)
+        print(score_knn)
+
+        # Données de test
+        #X_test = df.iloc[:, [3, 4]].values
+
+        # Prédiction des classes pour les données de test
+        y_pred = knn.predict(x)
+
+        performance=pd.DataFrame({'True Value': y, 'Prediction':y_pred,'Error':y-y_pred})
+
+        print(performance)
+        # Affichage des prédictions
+
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     sousensemble=prepartation_donnee()
     analyse_exploratoire(sousensemble[0],sousensemble[1],sousensemble[2])
-<<<<<<< HEAD
-    regression_linéaire(sousensemble[0])
-=======
->>>>>>> 39bc3bf6c079d3e0707602f3ed4b0ed021d8d549
+    #regression_lineaire(sousensemble[0])
+    regression_lineaire_regularise(sousensemble[0])
+    #knn(sousensemble[0])
