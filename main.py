@@ -7,7 +7,9 @@ from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Ridge
+from sklearn.linear_model import Lasso
 from sklearn.metrics import r2_score
+
 
 
 def prepartation_donnee():
@@ -211,38 +213,28 @@ def regression_lineaire_regularise(df):
     print(x_test)
     print(y_test)
 
-    rid = Ridge(10).fit(x_test, y_test)
+    # Ridge
+    rid = Ridge().fit(x_test, y_test)
     print(r2_score(y_test, rid.predict(x_test)))
-    """
-    
+    y_pred=rid.predict(x_test)
 
-    #x_log = np.log(x_test)
-    #y_log = np.log(y_test)
-
-    x_test = x_test.replace([np.inf, -np.inf], np.nan)
-    y_test = y_test.replace([np.inf, -np.inf], np.nan)
-
-    x_test = x_test.dropna()
-    y_test = y_test.dropna()
-
-    model = HistGradientBoostingRegressor().fit(x_test, y_test)
-    # Instance and fit
-    #lrLog_model = LinearRegression().fit(x_log, y_log)
-    # Remove zeroes
-    X_test_log = x_test[(x_test.x > 0) & (x_test.y > 0) & (x_test.z > 0) ]
-    y_test_log = y_test[X_test_log.index]
-    # Log Transform X_test and y test
-    X_test_log = np.log(X_test_log)
-    y_test_log = np.log(y_test_log)
-    # Score
-    score_log = model.score(X_test_log, y_test_log)
-    print(score_log)
-    # Predictions
-    preds = model.predict(X_test_log)
-    # Performance
-    performance=pd.DataFrame({ 'True Value': np.exp(y_test_log), 'Prediction': np.exp(preds)}).head(5)
+    performance = pd.DataFrame({'True Value': np.exp(y_test), 'Prediction': np.exp(y_pred),'Error':y_test-y_pred}).head(5)
     print(performance)
-    """
+
+    #Lasso
+    # Créer un objet Lasso en spécifiant le coefficient de régularisation alpha
+    reg = Lasso(alpha=0.1)
+
+    # Adapter le modèle à l'aide des données d'entraînement
+    reg.fit(x_test, y_test)
+    print(r2_score(y_test, reg.predict(x_test)))
+    # Utiliser le modèle pour faire des prédictions sur les données de test
+    y_pred = reg.predict(x_test)
+
+    performance = pd.DataFrame(
+        {'True Value': np.exp(y_test), 'Prediction': np.exp(y_pred), 'Error': y_test - y_pred}).head(5)
+    print(performance)
+
 def knn (df):
 
         x = df.iloc[:, 3:35]
@@ -256,7 +248,6 @@ def knn (df):
         #score
         score_knn=knn.score(x,y)
         print(score_knn)
-
         # Données de test
         #X_test = df.iloc[:, [3, 4]].values
 
