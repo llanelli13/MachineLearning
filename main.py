@@ -7,7 +7,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Ridge
 from sklearn.linear_model import Lasso
 from sklearn.metrics import r2_score
-
+from sklearn.tree import DecisionTreeRegressor
+import scipy
 
 
 def prepartation_donnee():
@@ -62,6 +63,7 @@ def analyse_exploratoire(df):
 
     #Matrice corrélation
 
+    """
     corr_matrix = df.corr()
     #Afficher la matrice de corrélation sous forme de heatmap
     sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
@@ -116,6 +118,7 @@ def analyse_exploratoire(df):
         plt.title('Graphique de dispersion entre valeurs corrélées négativement')
         plt.show()
 
+    """
 def regression_lineaire(df):
     x_test = df.iloc[:, 3:35]
     y_test = df["TARGET"]
@@ -124,46 +127,72 @@ def regression_lineaire(df):
     lr_model = LinearRegression()
     lr_model.fit(x_test, y_test)
 
+    print('\nRegression linéaire : ')
     # Score
     score_lr = lr_model.score(x_test, y_test)
-    print("Score " + str(score_lr))
+
 
     y_pred = lr_model.predict(x_test)
 
-    print('Regression linéaire : ')
+
     performance = pd.DataFrame(
         {'True Value': np.exp(y_test), 'Prediction': np.exp(y_pred), 'Error': y_test - y_pred}).head(5)
     print(performance)
+    mse = np.mean((y_test - y_pred) ** 2)
+    rmse = np.sqrt(mse)
+
+    print("Score " + str(score_lr))
+    print('Erreur quadratique :', rmse)
+    #res, pvalue = scipy.stats.spearmanr(x_test, y_test)
+    #print("Corrélation de Spearman: ", res)
+    #print("P-valeur: ", pvalue)
 
 def regression_lineaire_regularise(df):
     x_test = df.iloc[:, 3:35]
     y_test = df["TARGET"]
 
-
+    print('\nRegression linéaire régularisée RIDGE: ')
     # Ridge
     rid = Ridge(alpha=0.1)
     rid.fit(x_test, y_test)
-    print("Score" , r2_score(y_test, rid.predict(x_test)))
+
     y_pred=rid.predict(x_test)
 
-    print('Regression linéaire régularisée RIDGE: ')
-    performance = pd.DataFrame({'True Value': np.exp(y_test), 'Prediction': np.exp(y_pred),'Error':y_test-y_pred}).head(5)
+
+    performance = pd.DataFrame({'True Value': np.exp(y_test), 'Prediction': np.exp(y_pred),'Error':y_test-y_pred})
     print(performance)
+    mse = np.mean((y_test - y_pred) ** 2)
+    rmse = np.sqrt(mse)
+
+    print("Score :", r2_score(y_test, rid.predict(x_test)))
+    print('Erreur quadratique :', rmse)
+    #res, pvalue = scipy.stats.spearmanr(x_test, y_test)
+    #print("Corrélation de Spearman: ", res)
+    #print("P-valeur: ", pvalue)
 
     #Lasso
     # Créer un objet Lasso en spécifiant le coefficient de régularisation alpha
     reg = Lasso(alpha=0.1)
 
+    print('\nRegression linéaire régularisée LASSO: ')
     # Adapter le modèle à l'aide des données d'entraînement
     reg.fit(x_test, y_test)
-    print(r2_score(y_test, reg.predict(x_test)))
+
     # Utiliser le modèle pour faire des prédictions sur les données de test
     y_pred = reg.predict(x_test)
 
-    print('Regression linéaire régularisée LASSO: ')
+
     performance = pd.DataFrame(
-        {'True Value': np.exp(y_test), 'Prediction': np.exp(y_pred), 'Error': y_test - y_pred}).head(5)
+        {'True Value': np.exp(y_test), 'Prediction': np.exp(y_pred), 'Error': y_test - y_pred})
     print(performance)
+    mse = np.mean((y_test - y_pred) ** 2)
+    rmse = np.sqrt(mse)
+
+    print("Score :", r2_score(y_test, reg.predict(x_test)))
+    print('Erreur quadratique :', rmse)
+    #res, pvalue = scipy.stats.spearmanr(x_test, y_test)
+    #print("Corrélation de Spearman: ", res)
+    #print("P-valeur: ", pvalue)
 
 def knn (df):
 
@@ -173,18 +202,51 @@ def knn (df):
     # Création d'un classificateur k-NN avec k=3
     knn = KNeighborsRegressor(n_neighbors=5).fit(x,y)
 
+    print('\nMéthode des k plus proche voisin: ')
     #score
     score_knn=knn.score(x,y)
-    print("Score",score_knn)
+
     # Données de test
     #X_test = df.iloc[:, [3, 4]].values
 
     # Prédiction des classes pour les données de test
     y_pred = knn.predict(x)
 
-    print('Méthode des k plus proche voisin: ')
     performance=pd.DataFrame({'True Value': y, 'Prediction':y_pred,'Error':y-y_pred})
     print(performance)
+
+    # Calcule l'erreur quadratique moyenne (RMSE) entre les valeurs réelles et les valeurs prédites.
+    mse = np.mean((y - y_pred) ** 2)
+    rmse = np.sqrt(mse)
+
+    print("Score :", score_knn)
+    print('Erreur quadratique :', rmse)
+    #res, pvalue = scipy.stats.spearmanr(x, y)
+    #print("Corrélation de Spearman: ", res)
+    #print("P-valeur: ", pvalue)
+
+def arbre_decision(df):
+    x = df.iloc[:, 3:35]
+    y = df["TARGET"]
+    print('\nArbre de décision pour la régression: ')
+
+
+    model = DecisionTreeRegressor(max_depth=100)
+    model.fit(x, y)
+
+    y_pred = model.predict(x)
+    performance = pd.DataFrame({'True Value': y, 'Prediction': y_pred, 'Error': y - y_pred})
+    print(performance)
+
+    mse = np.mean((y - y_pred) ** 2)
+    rmse = np.sqrt(mse)
+
+    score_ab = model.score(x, y)
+    print("Score :", score_ab)
+    print('Erreur quadratique :', rmse)
+    #res, pvalue=scipy.stats.spearmanr(x, y)
+    #print("Corrélation de Spearman: ", res)
+    #print("P-valeur: ", pvalue)
 
 
 # Press the green button in the gutter to run the script.
@@ -194,3 +256,4 @@ if __name__ == '__main__':
     regression_lineaire(df)
     regression_lineaire_regularise(df)
     knn(df)
+    arbre_decision(df)
